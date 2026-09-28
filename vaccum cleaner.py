@@ -1,0 +1,76 @@
+def get_valid_input(prompt, valid_options):
+    """Helper function to validate user input against allowed options."""
+    while True:
+        user_input = input(prompt).strip().upper()
+        if user_input in valid_options:
+            return valid_options[user_input]
+        print(f"Invalid input. Please choose from: {', '.join(set(valid_options.keys()))}")
+
+
+def interactive_vacuum_agent():
+    print("=" * 50)
+    print("      2-ROOM VACUUM WORLD INTERACTIVE AGENT     ")
+    print("=" * 50)
+
+    # Option mapping for easy user input
+    status_options = {
+        'DIRTY': 'DIRTY', 'D': 'DIRTY',
+        'CLEAN': 'CLEAN', 'C': 'CLEAN'
+    }
+    position_options = {
+        'A': 'A', 'B': 'B'
+    }
+
+    while True:
+        print("\n--- Configure Initial Environment State ---")
+        room_a = get_valid_input("Enter status for Room A (DIRTY/CLEAN or D/C): ", status_options)
+        room_b = get_valid_input("Enter status for Room B (DIRTY/CLEAN or D/C): ", status_options)
+        vacuum_pos = get_valid_input("Enter initial Vacuum Position (A/B): ", position_options)
+
+        # Initialize environment state
+        rooms = {'A': room_a, 'B': room_b}
+        current_pos = vacuum_pos
+        actions = []
+
+        print("\n--- Starting Simulation ---")
+        print(f"Initial Setup: Room A = {rooms['A']} | Room B = {rooms['B']} | Vacuum Position = {current_pos}\n")
+
+        step = 1
+        while rooms['A'] == 'DIRTY' or rooms['B'] == 'DIRTY':
+            current_state = rooms[current_pos]
+           
+            if current_state == 'DIRTY':
+                action = "SUCK"
+                print(f"Step {step}: Vacuum at Room {current_pos} is DIRTY  --> Action: {action}")
+                rooms[current_pos] = 'CLEAN'
+                actions.append(action)
+            else:
+                if current_pos == 'A':
+                    action = "MOVE RIGHT"
+                    next_pos = 'B'
+                else:
+                    action = "MOVE LEFT"
+                    next_pos = 'A'
+               
+                print(f"Step {step}: Vacuum at Room {current_pos} is CLEAN  --> Action: {action}")
+                actions.append(action)
+                current_pos = next_pos
+           
+            step += 1
+
+        if not actions:
+            print("Step 1: Both rooms are already CLEAN! No cleaning required.")
+
+        print("\n--- Final Results ---")
+        print(f"Sequence of Actions : {' -> '.join(actions) if actions else 'None'}")
+        print(f"Final Room States   : Room A = {rooms['A']} | Room B = {rooms['B']}")
+
+        # Ask to replay
+        again = input("\nWould you like to test another scenario? (y/n): ").strip().lower()
+        if again not in ['y', 'yes']:
+            print("\nSimulation ended. Goodbye!")
+            break
+
+
+if __name__ == "__main__":
+    interactive_vacuum_agent()
